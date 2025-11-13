@@ -24,6 +24,8 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> filterAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> resonanceAttachment;
     
+    juce::Image logoImage;
+    
     void drawMetalTexture(juce::Graphics& g, juce::Rectangle<int> bounds);
     void drawScrew(juce::Graphics& g, float x, float y);
     void drawFrequencyDisplay(juce::Graphics& g, juce::Rectangle<int> bounds);

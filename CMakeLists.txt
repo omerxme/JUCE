@@ -34,10 +34,14 @@ target_sources(APTFilter PRIVATE
     Source/CustomLookAndFeel.cpp
 )
 
+# Binary resources (logo)
+juce_add_binary_data(APTFilterData SOURCES Resources/logo.png)
+
 # Link JUCE modules
 target_link_libraries(APTFilter PRIVATE
     juce::juce_audio_utils
     juce::juce_dsp
+    APTFilterData
 )
 
 target_compile_definitions(APTFilter PUBLIC

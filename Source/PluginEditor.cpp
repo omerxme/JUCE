@@ -1,5 +1,6 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "BinaryData.h"
 
 APTFilterEditor::APTFilterEditor(APTFilterProcessor& p)
     : AudioProcessorEditor(&p), audioProcessor(p)
@@ -47,6 +48,14 @@ APTFilterEditor::APTFilterEditor(APTFilterProcessor& p)
     
     resonanceAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
         audioProcessor.getAPVTS(), "resonance", resonanceSlider);
+    
+    // Load logo from binary data
+    int logoDataSize = 0;
+    const char* logoData = BinaryData::getNamedResource("logo_png", logoDataSize);
+    if (logoData != nullptr && logoDataSize > 0)
+    {
+        logoImage = juce::ImageFileFormat::loadFrom(logoData, logoDataSize);
+    }
     
     // Start timer for smooth glow updates
     startTimerHz(30);
@@ -229,6 +238,22 @@ void APTFilterEditor::paint(juce::Graphics& g)
     g.setColour(juce::Colour(0xffd4c5a9));
     g.drawText("HP", bounds.getWidth() - 120, bounds.getHeight() - 91, 60, 50, 
                juce::Justification::centred);
+    
+    // Draw logo at bottom center (screw level)
+    if (logoImage.isValid())
+    {
+        int logoHeight = 40; // Max height
+        float aspectRatio = logoImage.getWidth() / (float)logoImage.getHeight();
+        int logoWidth = (int)(logoHeight * aspectRatio);
+        
+        int logoX = (bounds.getWidth() - logoWidth) / 2;
+        int logoY = bounds.getHeight() - logoHeight - 25; // Screw level
+        
+        // Draw with slight transparency to blend with background
+        g.setOpacity(0.7f);
+        g.drawImage(logoImage, logoX, logoY, logoWidth, logoHeight,
+                   0, 0, logoImage.getWidth(), logoImage.getHeight());
+    }
 }
 
 void APTFilterEditor::resized()
