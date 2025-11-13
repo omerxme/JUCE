@@ -177,16 +177,16 @@ void APTDriveEditor::paint(juce::Graphics& g)
     g.setColour(textColor);
     g.drawText(driveText, bounds.getX(), textY, bounds.getWidth(), 40, juce::Justification::centred);
     
-    g.setFont(juce::Font("Arial", 36.0f, juce::Font::bold));
+    g.setFont(juce::Font("Arial", 32.0f, juce::Font::bold));
     g.setColour(juce::Colour(0xff000000).withAlpha(0.5f));
-    g.drawText("CLEAN", 41, bounds.getHeight() - 90, 80, 50, juce::Justification::centred);
+    g.drawText("CLEAN", 20, bounds.getHeight() - 90, 110, 50, juce::Justification::centred);
     g.setColour(juce::Colour(0xffd4c5a9));
-    g.drawText("CLEAN", 40, bounds.getHeight() - 91, 80, 50, juce::Justification::centred);
+    g.drawText("CLEAN", 19, bounds.getHeight() - 91, 110, 50, juce::Justification::centred);
     
     g.setColour(juce::Colour(0xff000000).withAlpha(0.5f));
-    g.drawText("DRIVE", bounds.getWidth() - 121, bounds.getHeight() - 90, 80, 50, juce::Justification::centred);
+    g.drawText("DRIVE", bounds.getWidth() - 131, bounds.getHeight() - 90, 110, 50, juce::Justification::centred);
     g.setColour(juce::Colour(0xffd4c5a9));
-    g.drawText("DRIVE", bounds.getWidth() - 120, bounds.getHeight() - 91, 80, 50, juce::Justification::centred);
+    g.drawText("DRIVE", bounds.getWidth() - 130, bounds.getHeight() - 91, 110, 50, juce::Justification::centred);
     
     if (logoImage.isValid())
     {

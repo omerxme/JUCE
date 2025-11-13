@@ -175,14 +175,14 @@ void APTPunchEditor::paint(juce::Graphics& g)
     
     g.setFont(juce::Font("Arial", 36.0f, juce::Font::bold));
     g.setColour(juce::Colour(0xff000000).withAlpha(0.5f));
-    g.drawText("SOFT", 51, bounds.getHeight() - 90, 70, 50, juce::Justification::centred);
+    g.drawText("SOFT", 30, bounds.getHeight() - 90, 100, 50, juce::Justification::centred);
     g.setColour(juce::Colour(0xffd4c5a9));
-    g.drawText("SOFT", 50, bounds.getHeight() - 91, 70, 50, juce::Justification::centred);
+    g.drawText("SOFT", 29, bounds.getHeight() - 91, 100, 50, juce::Justification::centred);
     
     g.setColour(juce::Colour(0xff000000).withAlpha(0.5f));
-    g.drawText("PUNCH", bounds.getWidth() - 121, bounds.getHeight() - 90, 70, 50, juce::Justification::centred);
+    g.drawText("HARD", bounds.getWidth() - 131, bounds.getHeight() - 90, 100, 50, juce::Justification::centred);
     g.setColour(juce::Colour(0xffd4c5a9));
-    g.drawText("PUNCH", bounds.getWidth() - 120, bounds.getHeight() - 91, 70, 50, juce::Justification::centred);
+    g.drawText("HARD", bounds.getWidth() - 130, bounds.getHeight() - 91, 100, 50, juce::Justification::centred);
     
     if (logoImage.isValid())
     {

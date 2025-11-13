@@ -175,14 +175,14 @@ void APTTiltEditor::paint(juce::Graphics& g)
     
     g.setFont(juce::Font("Arial", 36.0f, juce::Font::bold));
     g.setColour(juce::Colour(0xff000000).withAlpha(0.5f));
-    g.drawText("DARK", 51, bounds.getHeight() - 90, 70, 50, juce::Justification::centred);
+    g.drawText("WARM", 25, bounds.getHeight() - 90, 105, 50, juce::Justification::centred);
     g.setColour(juce::Colour(0xffd4c5a9));
-    g.drawText("DARK", 50, bounds.getHeight() - 91, 70, 50, juce::Justification::centred);
+    g.drawText("WARM", 24, bounds.getHeight() - 91, 105, 50, juce::Justification::centred);
     
     g.setColour(juce::Colour(0xff000000).withAlpha(0.5f));
-    g.drawText("BRIGHT", bounds.getWidth() - 121, bounds.getHeight() - 90, 70, 50, juce::Justification::centred);
+    g.drawText("LITE", bounds.getWidth() - 131, bounds.getHeight() - 90, 105, 50, juce::Justification::centred);
     g.setColour(juce::Colour(0xffd4c5a9));
-    g.drawText("BRIGHT", bounds.getWidth() - 120, bounds.getHeight() - 91, 70, 50, juce::Justification::centred);
+    g.drawText("LITE", bounds.getWidth() - 130, bounds.getHeight() - 91, 105, 50, juce::Justification::centred);
     
     if (logoImage.isValid())
     {

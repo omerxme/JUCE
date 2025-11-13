@@ -214,15 +214,15 @@ void APTChorusEditor::paint(juce::Graphics& g)
     // Draw "DRY" and "WET" labels
     g.setFont(juce::Font("Arial", 36.0f, juce::Font::bold));
     g.setColour(juce::Colour(0xff000000).withAlpha(0.5f));
-    g.drawText("DRY", 41, bounds.getHeight() - 90, 80, 50, juce::Justification::centred);
+    g.drawText("DRY", 30, bounds.getHeight() - 90, 100, 50, juce::Justification::centred);
     g.setColour(juce::Colour(0xffd4c5a9));
-    g.drawText("DRY", 40, bounds.getHeight() - 91, 80, 50, juce::Justification::centred);
+    g.drawText("DRY", 29, bounds.getHeight() - 91, 100, 50, juce::Justification::centred);
     
     g.setColour(juce::Colour(0xff000000).withAlpha(0.5f));
-    g.drawText("WET", bounds.getWidth() - 121, bounds.getHeight() - 90, 80, 50, 
+    g.drawText("WET", bounds.getWidth() - 131, bounds.getHeight() - 90, 100, 50, 
                juce::Justification::centred);
     g.setColour(juce::Colour(0xffd4c5a9));
-    g.drawText("WET", bounds.getWidth() - 120, bounds.getHeight() - 91, 80, 50, 
+    g.drawText("WET", bounds.getWidth() - 130, bounds.getHeight() - 91, 100, 50, 
                juce::Justification::centred);
     
     // Draw logo
