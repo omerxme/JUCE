@@ -42,8 +42,9 @@ private:
     
     juce::dsp::ProcessorDuplicator<Filter, FilterCoefs> leftFilter, rightFilter;
     juce::SmoothedValue<float> smoothedFilterValue;
+    juce::SmoothedValue<float> smoothedResonance;
 
-    void updateFilter(float filterValue, double sampleRate);
+    void updateFilter(float filterValue, float resonance, double sampleRate);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(APTFilterProcessor)
 };

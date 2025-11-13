@@ -8,6 +8,7 @@ APTFilterProcessor::APTFilterProcessor()
       apvts(*this, nullptr, "Parameters", createParameterLayout())
 {
     smoothedFilterValue.setCurrentAndTargetValue(0.0f);
+    smoothedResonance.setCurrentAndTargetValue(0.707f);
 }
 
 APTFilterProcessor::~APTFilterProcessor() {}
@@ -31,6 +32,17 @@ juce::AudioProcessorValueTreeState::ParameterLayout APTFilterProcessor::createPa
             else
                 return juce::String("Bypass");
         }));
+    
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        "resonance",
+        "Resonance",
+        juce::NormalisableRange<float>(0.5f, 10.0f, 0.01f, 0.4f), // Skewed towards lower values
+        0.707f, // Default Q (Butterworth)
+        juce::String(),
+        juce::AudioProcessorParameter::genericParameter,
+        [](float value, int) {
+            return juce::String(value, 2);
+        }));
 
     return layout;
 }
@@ -45,9 +57,10 @@ void APTFilterProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
     leftFilter.prepare(spec);
     rightFilter.prepare(spec);
     
-    smoothedFilterValue.reset(sampleRate, 0.05); // 50ms smoothing
+    smoothedFilterValue.reset(sampleRate, 0.1); // 100ms smoothing
+    smoothedResonance.reset(sampleRate, 0.05); // 50ms smoothing for resonance
     
-    updateFilter(0.0f, sampleRate);
+    updateFilter(0.0f, 0.707f, sampleRate);
 }
 
 void APTFilterProcessor::releaseResources() {}
@@ -63,7 +76,7 @@ bool APTFilterProcessor::isBusesLayoutSupported(const BusesLayout& layouts) cons
     return true;
 }
 
-void APTFilterProcessor::updateFilter(float filterValue, double sampleRate)
+void APTFilterProcessor::updateFilter(float filterValue, float resonance, double sampleRate)
 {
     const float threshold = 0.01f;
     
@@ -74,8 +87,8 @@ void APTFilterProcessor::updateFilter(float filterValue, double sampleRate)
         float cutoffFreq = 200.0f + normalizedValue * (20000.0f - 200.0f);
         cutoffFreq = juce::jlimit(200.0f, 20000.0f, cutoffFreq);
         
-        *leftFilter.state = *FilterCoefs::makeLowPass(sampleRate, cutoffFreq, 0.707f);
-        *rightFilter.state = *FilterCoefs::makeLowPass(sampleRate, cutoffFreq, 0.707f);
+        *leftFilter.state = *FilterCoefs::makeLowPass(sampleRate, cutoffFreq, resonance);
+        *rightFilter.state = *FilterCoefs::makeLowPass(sampleRate, cutoffFreq, resonance);
     }
     else if (filterValue > threshold)
     {
@@ -83,8 +96,8 @@ void APTFilterProcessor::updateFilter(float filterValue, double sampleRate)
         float cutoffFreq = 20.0f + filterValue * (1000.0f - 20.0f);
         cutoffFreq = juce::jlimit(20.0f, 1000.0f, cutoffFreq);
         
-        *leftFilter.state = *FilterCoefs::makeHighPass(sampleRate, cutoffFreq, 0.707f);
-        *rightFilter.state = *FilterCoefs::makeHighPass(sampleRate, cutoffFreq, 0.707f);
+        *leftFilter.state = *FilterCoefs::makeHighPass(sampleRate, cutoffFreq, resonance);
+        *rightFilter.state = *FilterCoefs::makeHighPass(sampleRate, cutoffFreq, resonance);
     }
     else
     {
@@ -104,71 +117,64 @@ void APTFilterProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::Mi
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear(i, 0, buffer.getNumSamples());
 
-    // Get parameter value and set target for smoothing
+    // Get parameter values and set targets for smoothing
     float targetFilterValue = *apvts.getRawParameterValue("filter");
+    float targetResonance = *apvts.getRawParameterValue("resonance");
+    
     smoothedFilterValue.setTargetValue(targetFilterValue);
+    smoothedResonance.setTargetValue(targetResonance);
     
     // Update filter coefficients at the start of the block
     float currentFilterValue = smoothedFilterValue.getCurrentValue();
+    float currentResonance = smoothedResonance.getCurrentValue();
     
-    const float threshold = 0.05f; // Wider threshold for smoother transition
-    const float fadeZone = 0.1f;   // Fade zone around bypass
+    // ALWAYS use crossfade to prevent clicks
+    // Calculate mix amount based on filter value (0.0 = bypass, 1.0 = full filter)
+    float mixAmount = std::abs(currentFilterValue);
     
-    // Calculate mix amount (0.0 = bypass, 1.0 = full filter)
-    float mixAmount = 1.0f;
-    if (std::abs(currentFilterValue) < fadeZone)
+    // Use cubic smoothstep for even smoother transition
+    mixAmount = mixAmount * mixAmount * (3.0f - 2.0f * mixAmount);
+    
+    // Always create dry buffer copy
+    juce::AudioBuffer<float> dryBuffer;
+    dryBuffer.makeCopyOf(buffer);
+    
+    // Always update and apply filter (even at low values)
+    updateFilter(currentFilterValue, currentResonance, getSampleRate());
+    
+    juce::dsp::AudioBlock<float> block(buffer);
+    
+    // Process left channel
+    if (totalNumInputChannels > 0)
     {
-        mixAmount = std::abs(currentFilterValue) / fadeZone;
+        auto leftBlock = block.getSingleChannelBlock(0);
+        juce::dsp::ProcessContextReplacing<float> leftContext(leftBlock);
+        leftFilter.process(leftContext);
     }
     
-    bool shouldProcess = std::abs(currentFilterValue) > threshold;
-    
-    if (shouldProcess)
+    // Process right channel
+    if (totalNumInputChannels > 1)
     {
-        // Create a copy of the dry signal for crossfading
-        juce::AudioBuffer<float> dryBuffer;
-        dryBuffer.makeCopyOf(buffer);
+        auto rightBlock = block.getSingleChannelBlock(1);
+        juce::dsp::ProcessContextReplacing<float> rightContext(rightBlock);
+        rightFilter.process(rightContext);
+    }
+    
+    // ALWAYS crossfade between dry and wet
+    for (int channel = 0; channel < totalNumInputChannels; ++channel)
+    {
+        auto* wetData = buffer.getWritePointer(channel);
+        auto* dryData = dryBuffer.getReadPointer(channel);
         
-        // Update and apply filter
-        updateFilter(currentFilterValue, getSampleRate());
-        
-        juce::dsp::AudioBlock<float> block(buffer);
-        
-        // Process left channel
-        if (totalNumInputChannels > 0)
+        for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
         {
-            auto leftBlock = block.getSingleChannelBlock(0);
-            juce::dsp::ProcessContextReplacing<float> leftContext(leftBlock);
-            leftFilter.process(leftContext);
-        }
-        
-        // Process right channel
-        if (totalNumInputChannels > 1)
-        {
-            auto rightBlock = block.getSingleChannelBlock(1);
-            juce::dsp::ProcessContextReplacing<float> rightContext(rightBlock);
-            rightFilter.process(rightContext);
-        }
-        
-        // Crossfade between dry and wet near bypass zone
-        if (mixAmount < 1.0f)
-        {
-            for (int channel = 0; channel < totalNumInputChannels; ++channel)
-            {
-                auto* wetData = buffer.getWritePointer(channel);
-                auto* dryData = dryBuffer.getReadPointer(channel);
-                
-                for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
-                {
-                    wetData[sample] = dryData[sample] * (1.0f - mixAmount) + wetData[sample] * mixAmount;
-                }
-            }
+            wetData[sample] = dryData[sample] * (1.0f - mixAmount) + wetData[sample] * mixAmount;
         }
     }
-    // If not processing, audio passes through unchanged
     
-    // Advance the smoothed value for next block
+    // Advance the smoothed values for next block
     smoothedFilterValue.skip(buffer.getNumSamples());
+    smoothedResonance.skip(buffer.getNumSamples());
 }
 
 juce::AudioProcessorEditor* APTFilterProcessor::createEditor()
