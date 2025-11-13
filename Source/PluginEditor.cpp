@@ -153,6 +153,27 @@ void APTFilterEditor::paint(juce::Graphics& g)
     // Only draw glow if filter is active
     if (glowIntensity > 0.01f)
     {
+        // Determine glow color based on filter direction
+        bool isLowPass = filterValue < 0.0f;
+        
+        // LP = Cool colors (blue/cyan), HP = Warm colors (orange/yellow)
+        juce::Colour baseColor, midColor, hotColor;
+        
+        if (isLowPass)
+        {
+            // Low-Pass: Ice blue colors
+            baseColor = juce::Colour(0xff4da6ff);  // Light blue
+            midColor = juce::Colour(0xff66b3ff);   // Lighter blue
+            hotColor = juce::Colour(0xffa3d5ff);   // Almost white blue
+        }
+        else
+        {
+            // High-Pass: Warm orange colors
+            baseColor = juce::Colour(0xffff8c00);  // Orange
+            midColor = juce::Colour(0xffffa500);   // Light orange
+            hotColor = juce::Colour(0xffffd700);   // Gold/yellow
+        }
+        
         // Ultra-smooth outer glow - maximum blur effect
         for (int i = 80; i > 0; --i)
         {
@@ -160,7 +181,7 @@ void APTFilterEditor::paint(juce::Graphics& g)
             // Quartic falloff for ultra-smooth fade
             float falloff = layerProgress * layerProgress * layerProgress * layerProgress;
             float alpha = glowIntensity * 0.025f * falloff;
-            g.setColour(juce::Colour(0xffff8c00).withAlpha(alpha));
+            g.setColour(baseColor.withAlpha(alpha));
             float r = knobRadius + i * 3.5f;
             g.fillEllipse(centerX - r, centerY - r, r * 2, r * 2);
         }
@@ -171,19 +192,22 @@ void APTFilterEditor::paint(juce::Graphics& g)
             float layerProgress = i / 40.0f;
             float falloff = layerProgress * layerProgress * layerProgress;
             float alpha = glowIntensity * 0.04f * falloff;
-            g.setColour(juce::Colour(0xffff8c00).withAlpha(alpha));
+            
+            // Subtle color transition
+            juce::Colour glowColor = baseColor.interpolatedWith(midColor, (1.0f - layerProgress) * 0.5f);
+            g.setColour(glowColor.withAlpha(alpha));
             float r = knobRadius + i * 1.8f;
             g.fillEllipse(centerX - r, centerY - r, r * 2, r * 2);
         }
         
-        // Inner glow - extremely subtle
+        // Inner glow - color transition to hottest color
         for (int i = 25; i > 0; --i)
         {
             float layerProgress = 1.0f - (i / 25.0f);
             
-            // Very subtle color - stay mostly orange
-            juce::Colour glowColor = juce::Colour(0xffff8c00).interpolatedWith(
-                juce::Colour(0xffffa500), glowIntensity * layerProgress * 0.3f);
+            // Transition from mid to hot color based on intensity and layer
+            juce::Colour glowColor = midColor.interpolatedWith(
+                hotColor, glowIntensity * layerProgress * 0.6f);
             
             float alpha = glowIntensity * (0.08f + layerProgress * 0.12f);
             g.setColour(glowColor.withAlpha(alpha));
@@ -376,7 +400,7 @@ void APTFilterEditor::drawFrequencyDisplay(juce::Graphics& g, juce::Rectangle<in
     g.drawText(freqText, bounds.getX(), textY + 2, bounds.getWidth(), 40, 
                juce::Justification::centred);
     
-    // Main text with glow color
+    // Main text with glow color (matches filter direction)
     float glowIntensity = std::abs(filterValue);
     juce::Colour textColor;
     
@@ -384,15 +408,31 @@ void APTFilterEditor::drawFrequencyDisplay(juce::Graphics& g, juce::Rectangle<in
     {
         textColor = juce::Colour(0xff888888); // Gray for bypass
     }
-    else if (glowIntensity < 0.5f)
+    else if (filterValue < 0.0f)
     {
-        textColor = juce::Colour(0xffff8c00); // Orange
+        // Low-Pass: Blue colors
+        if (glowIntensity < 0.5f)
+        {
+            textColor = juce::Colour(0xff4da6ff); // Light blue
+        }
+        else
+        {
+            float t = (glowIntensity - 0.5f) * 2.0f;
+            textColor = juce::Colour(0xff4da6ff).interpolatedWith(juce::Colour(0xffa3d5ff), t);
+        }
     }
     else
     {
-        // Transition to yellow/white at high intensity
-        float t = (glowIntensity - 0.5f) * 2.0f;
-        textColor = juce::Colour(0xffff8c00).interpolatedWith(juce::Colour(0xffffd700), t);
+        // High-Pass: Orange colors
+        if (glowIntensity < 0.5f)
+        {
+            textColor = juce::Colour(0xffff8c00); // Orange
+        }
+        else
+        {
+            float t = (glowIntensity - 0.5f) * 2.0f;
+            textColor = juce::Colour(0xffff8c00).interpolatedWith(juce::Colour(0xffffd700), t);
+        }
     }
     
     g.setColour(textColor);
