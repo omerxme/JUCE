@@ -1,7 +1,8 @@
 # Active Context
 
 ## Current Focus
-**LATEST:** APT-FILTER is complete and production-ready! Foundation established for APT Suite development.
+**IN PROGRESS:** APT-TOOL (7th plugin) - Utility plugin with Ableton-style interface
+**MILESTONE:** APT Suite - 6 plugins complete and production-ready!
 
 ## Recent Changes (Complete Feature List)
 
@@ -53,13 +54,76 @@
 
 ## Next Steps - Enhancement Ideas
 
-### ✅ COMPLETED
-1. ✅ **Frequency Display** - Real-time cutoff frequency
-2. ✅ **Filter Type Indicator** - LOW PASS / BYPASS / HIGH PASS
-3. ✅ **Resonance/Q Control** - Second knob (Q: 0.5 - 10.0)
-4. ✅ **Frequency Response Graph** - Real-time curve behind knob
-5. ✅ **Preset System** - 6 factory presets with dropdown
-6. ✅ **Color-Coded Glow** - Blue (LP) / Orange (HP)
+### 🔧 APT-TOOL (7th Plugin - IN PROGRESS)
+
+**Design:** Ableton Utility-style interface (horizontal layout)
+**Status:** Basic structure complete, needs debugging
+
+**Left Side (Input):**
+- ØL / ØR buttons (Phase invert L/R)
+- Stereo dropdown (Stereo/Mono/Swap)
+- Width knob (0-200%)
+- Mono button
+- Bass Mono button (120 Hz crossover)
+
+**Right Side (Output):**
+- Gain knob (-20 to +20 dB)
+- Balance knob (L-C-R)
+- Mute button
+- DC button (DC removal filter)
+
+**Technical:**
+- Multi-control layout (not single knob)
+- Horizontal split design
+- All parameters implemented in processor
+- UI layout complete
+- Build successful but needs testing/fixes
+
+**Next Steps:**
+- Debug and test all controls
+- Fix any parameter issues
+- Test audio processing
+- Polish UI layout
+- Add presets if needed
+
+### ✅ APT SUITE COMPLETED (6 Plugins)
+
+**1. APT-FILTER** ✅
+- Bipolar filter (LPF/HPF)
+- Resonance control
+- Frequency response graph
+- 6 presets
+- Blue/Orange glow
+
+**2. APT-CHORUS** ✅
+- Rate + Depth + Mix unified
+- Cyan/Blue/Purple glow
+- Max effect scaled to 70%
+- 6 presets (Subtle Width, Vocal, Synth Pad, Ensemble, Maximum, Bypass)
+
+**3. APT-DRIVE** ✅
+- Soft clipping + tape saturation
+- Amber/Orange/Red glow
+- Automatic gain compensation
+- 6 presets (Clean Warmth, Tape, Analog, Gentle Drive, Maximum, Bypass)
+
+**4. APT-TILT** ✅
+- Tilt EQ (bipolar)
+- Orange (warm) / Blue (lite) glow
+- Low/High shelf filters
+- 6 presets (Very Dark, Warm, Neutral, Bright, Very Bright, Bypass)
+
+**5. APT-PUNCH** ✅
+- Transient shaper (bipolar)
+- Purple (soft) / Red (hard) glow
+- Attack/Sustain control
+- 6 presets (Pad-like, Soft, Natural, Punchy, Maximum, Bypass)
+
+**6. APT-WIDE** ✅
+- MS-based stereo imager (bipolar)
+- Red (mono) / Cyan (wide) glow
+- Bass protection (150-200 Hz)
+- 6 presets (Mono, Narrow, Natural, Wide, Maximum, Bypass)
 
 ### Priority 1: Remaining Visual Polish (1-2 days)
 1. **Circular Progress Ring** - Visual position indicator around knob
