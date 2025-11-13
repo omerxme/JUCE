@@ -43,9 +43,11 @@
   - DJ Filter (-0.85, Q=3.5)
   - Bypass (0.0, Q=0.707)
 - ✅ **Frequency Response Graph:** Real-time curve display
-  - Positioned behind main knob
+  - **OPTIMIZED:** Embedded inside knob (160px)
+  - **FIXED:** Mouse events pass through (hitTest + setInterceptsMouseClicks)
   - Updates at 30 Hz
   - Color-coded (Blue/Orange/Gray)
+  - Subtle transparent background (alpha 0.15)
   - Grid lines for reference
   - Magnitude response calculation
 
