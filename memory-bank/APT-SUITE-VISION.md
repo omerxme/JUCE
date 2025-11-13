@@ -30,55 +30,77 @@
 
 ---
 
-### 🔥 APT-DRIVE (Saturation/Distortion)
-**Knob:** Unipolar (0% Clean → 100% Driven)  
-**Glow:** Orange → Red → White (heat-based)  
-**Extra:** Tone knob (dark ↔ bright)
+### 🔥 APT-DRIVE (Saturation/Warmth)
+**Knob:** Unipolar (0% Clean → 100% Saturated)  
+**Glow:** Amber → Orange → Warm Red  
+**Type:** Soft clipping + tape saturation hybrid
 
-**What it does:**
-- Clean (0%) → Warm (25%) → Driven (50%) → Distorted (100%)
-- Analog-style saturation
-- Automatic gain compensation
-- Musical harmonics
+**Knob Behavior:**
+- 0%: Completely clean
+- 0-40%: Gentle harmonic thickness (soft even/odd harmonics)
+- 40-80%: Tape-style compression + more pronounced harmonics
+- 80-100%: Gentle analog clipping (NOT harsh distortion)
+
+**Technical:**
+- Input trim + saturator amount controlled by single knob
+- Automatic output gain compensation
+- Maintains perceived loudness
+
+**Use Cases:**
+- Add warmth to vocals
+- Thicken synths
+- Add body to drums
+- Gentle harmonic enhancement
 
 **Presets:**
-- Clean Warmth
-- Tape Saturation
-- Tube Drive
-- Aggressive Distortion
-- Subtle Glue
-- Bypass
+- Clean Warmth (20%)
+- Tape Saturation (50%)
+- Analog Thickness (70%)
+- Gentle Drive (90%)
+- Bypass (0%)
 
 **Visual:**
-- Glow gets hotter (orange → red → white)
-- Like heating metal
-- Intensity = heat
+- Warm amber glow
+- Gets warmer (not aggressive red)
+- Vintage tape aesthetic
 
 ---
 
 ### 🌊 APT-CHORUS (Modulation)
 **Knob:** Unipolar (0% Dry → 100% Wet)  
 **Glow:** Cyan → Blue → Purple (water/space theme)  
-**Extra:** Rate knob (slow ↔ fast)
+**Type:** Rate + Depth + Mix unified control
 
-**What it does:**
-- Subtle chorus (0-30%)
-- Classic chorus (30-70%)
-- Ensemble (70-100%)
-- Automatic depth scaling
+**Knob Behavior:**
+- 0%: Completely dry, no modulation
+- 0-50%: Low depth, wide stereo modulation (clean for vocals/pads)
+- 50-100%: Depth increases, rate slightly faster, mix approaches maximum
+
+**Important:** Rate doesn't speed up too much - goal is "single knob gives usable, sweet chorus"
+
+**Technical:**
+- Rate, depth, and mix all scale together intelligently
+- Stereo widening effect
+- Phase-safe algorithm
+
+**Use Cases:**
+- Widen pads
+- Soften synth leads
+- Add dimension to vocals
+- Create ensemble effect
 
 **Presets:**
-- Subtle Width
-- Classic Chorus
-- Ensemble
-- Vibrato
-- Shimmer
-- Bypass
+- Subtle Width (25%)
+- Vocal Chorus (40%)
+- Synth Pad (60%)
+- Ensemble (80%)
+- Maximum (100%)
+- Bypass (0%)
 
 **Visual:**
-- Cool colors (water theme)
-- Glow pulses with LFO rate
-- Dreamy aesthetic
+- Cool water colors
+- Glow pulses gently with LFO
+- Dreamy, flowing aesthetic
 
 ---
 
@@ -160,55 +182,82 @@
 
 ---
 
-### 🎵 APT-DELAY (Echo/Delay)
-**Knob:** Unipolar (0% Dry → 100% Wet)  
-**Glow:** Teal → Cyan → White (echo theme)  
-**Extra:** Time knob (short ↔ long)
+### 👊 APT-PUNCH (Transient Shaper)
+**Knob:** Bipolar (-100% Soft → 0% Natural → +100% Punchy)  
+**Glow:** Purple (soft) / Gray (neutral) / Red (punchy)  
+**Type:** Attack/Sustain unified transient shaper
 
-**What it does:**
-- Slap delay (short)
-- Quarter note (medium)
-- Long echo (long)
-- Tempo sync option
+**Knob Behavior:**
+- 0%: Flat, no processing
+- 0 → +100%:
+  - Attack gain increases (transients emphasized)
+  - Sustain slightly decreases
+- 0 → -100%:
+  - Attack decreases (softening)
+  - Sustain slightly increases (pad-like width)
+
+**Technical:**
+- Envelope follower with attack/sustain detection
+- Independent attack and sustain gain control
+- Transparent processing
+
+**Use Cases:**
+- Add punch to kick/snare
+- Tighten percussion
+- Sharpen synth plucks
+- Clean up vocal transients
+- Soften aggressive sounds
 
 **Presets:**
-- Slap Back
-- Quarter Note
-- Dotted Eighth
-- Ping Pong
-- Tape Echo
-- Bypass
+- Soft (-40%)
+- Natural (0%)
+- Punchy (+40%)
+- Maximum Punch (+80%)
+- Pad-like (-80%)
+- Bypass (0%)
 
 **Visual:**
-- Rhythmic pulse
-- Echo visualization
-- Time-based glow
+- Purple glow for soft
+- Red glow for punchy
+- Gray at neutral
+- Intensity = transient emphasis
 
 ---
 
-### 🎸 APT-PHASER (Phase Shifter)
-**Knob:** Unipolar (0% Dry → 100% Wet)  
-**Glow:** Purple → Magenta → Pink (psychedelic)  
-**Extra:** Rate knob (slow ↔ fast)
+### 🎚️ APT-TILT (Tonal Balance)
+**Knob:** Bipolar (-100% Dark → 0% Neutral → +100% Bright)  
+**Glow:** Warm Orange (dark) / Gray (neutral) / Cool Blue (bright)  
+**Type:** Tilt EQ - single knob tonal tilt
 
-**What it does:**
-- Subtle phase (0-30%)
-- Classic phaser (30-70%)
-- Extreme sweep (70-100%)
-- Vintage character
+**Knob Behavior:**
+- 0%: Natural tone, no processing
+- 0 → +100%: 1-3 dB/oct steepness, high boost + low cut together
+- 0 → -100%: Low boost + high cut together
+
+**Technical:**
+- Shelving filters with opposite slopes
+- Pivot point around 1 kHz
+- Musical, broad curves
+
+**Use Cases:**
+- Quick "bright-dark" adjustment on mix
+- Vocal tone shaping
+- Piano brightness control
+- Synth stem tonal balance
 
 **Presets:**
-- Subtle Movement
-- Classic Phaser
-- Fast Sweep
-- Slow Sweep
-- Resonant
-- Bypass
+- Warm (-40%)
+- Neutral (0%)
+- Bright (+40%)
+- Very Bright (+80%)
+- Very Dark (-80%)
+- Bypass (0%)
 
 **Visual:**
-- Psychedelic colors
-- Swirling effect
-- Retro vibe
+- Warm orange glow for dark
+- Cool blue glow for bright
+- Gray at neutral
+- Smooth color transition
 
 ---
 
