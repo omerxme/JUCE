@@ -24,15 +24,33 @@ apt-filter/
 │   ├── PluginProcessor.h
 │   ├── PluginProcessor.cpp
 │   ├── PluginEditor.h
-│   └── PluginEditor.cpp
+│   ├── PluginEditor.cpp
+│   ├── CustomLookAndFeel.h
+│   └── CustomLookAndFeel.cpp
 └── memory-bank/
+    ├── projectbrief.md
+    ├── productContext.md
+    ├── activeContext.md
+    ├── systemPatterns.md
+    ├── techContext.md
+    └── progress.md
 ```
 
 ## Key Technical Decisions
-1. Use JUCE's IIR filter classes for DSP
-2. Implement smooth parameter changes to avoid clicks
-3. Use atomic parameters for thread-safe audio processing
-4. Separate filter logic into dedicated DSP class
+
+### Audio Processing
+1. Use JUCE's IIR filter classes for DSP (ProcessorDuplicator)
+2. Implement smooth parameter changes to avoid clicks (SmoothedValue, 50ms)
+3. Use atomic parameters for thread-safe audio processing (APVTS)
+4. Crossfade wet/dry for smooth bypass transitions (±0.1 fade zone)
+5. True bypass at center position (no DSP processing)
+
+### UI/UX
+1. Custom LookAndFeel class for vintage knob design
+2. Timer-based repaint for smooth glow animation (30 Hz)
+3. Snap-to-center behavior for better user experience (±0.05)
+4. Multi-layer glow rendering (85 total layers)
+5. Color interpolation for heat effect (orange→yellow→white)
 
 ## Build Commands
 ```bash
