@@ -141,56 +141,44 @@ void APTFilterEditor::paint(juce::Graphics& g)
     float filterValue = static_cast<float>(filterSlider.getValue());
     float glowIntensity = std::abs(filterValue);
     
-    // Subtle pulsing effect (breathing)
-    float pulseAmount = 1.0f + (std::sin(pulsePhase) * 0.08f); // ±8% variation
-    float pulsedIntensity = glowIntensity * pulseAmount;
-    
     // Only draw glow if filter is active
     if (glowIntensity > 0.01f)
     {
-        // Outer glow - soft fade to darkness (like light spreading)
-        for (int i = 50; i > 0; --i)
+        // Ultra-smooth outer glow - maximum blur effect
+        for (int i = 80; i > 0; --i)
         {
-            float layerProgress = i / 50.0f;
-            float alpha = pulsedIntensity * 0.08f * layerProgress * layerProgress; // Quadratic falloff
+            float layerProgress = i / 80.0f;
+            // Quartic falloff for ultra-smooth fade
+            float falloff = layerProgress * layerProgress * layerProgress * layerProgress;
+            float alpha = glowIntensity * 0.025f * falloff;
             g.setColour(juce::Colour(0xffff8c00).withAlpha(alpha));
-            float r = knobRadius + i * 5;
+            float r = knobRadius + i * 3.5f;
             g.fillEllipse(centerX - r, centerY - r, r * 2, r * 2);
         }
         
-        // Middle glow - brighter orange
-        for (int i = 20; i > 0; --i)
+        // Middle glow - very smooth, low opacity
+        for (int i = 40; i > 0; --i)
         {
-            float layerProgress = i / 20.0f;
-            float alpha = pulsedIntensity * 0.15f * layerProgress;
+            float layerProgress = i / 40.0f;
+            float falloff = layerProgress * layerProgress * layerProgress;
+            float alpha = glowIntensity * 0.04f * falloff;
             g.setColour(juce::Colour(0xffff8c00).withAlpha(alpha));
-            float r = knobRadius + i * 2;
+            float r = knobRadius + i * 1.8f;
             g.fillEllipse(centerX - r, centerY - r, r * 2, r * 2);
         }
         
-        // Inner hot ring - transitions from orange to yellow to white (like heating metal)
-        for (int i = 15; i > 0; --i)
+        // Inner glow - extremely subtle
+        for (int i = 25; i > 0; --i)
         {
-            float layerProgress = 1.0f - (i / 15.0f); // 0 at outer, 1 at inner
+            float layerProgress = 1.0f - (i / 25.0f);
             
-            // Color transition: orange -> yellow -> white based on intensity
-            juce::Colour glowColor;
-            if (glowIntensity < 0.5f)
-            {
-                // Low intensity: orange to yellow
-                float t = glowIntensity * 2.0f; // 0 to 1
-                glowColor = juce::Colour(0xffff8c00).interpolatedWith(juce::Colour(0xffffd700), t * layerProgress);
-            }
-            else
-            {
-                // High intensity: yellow to white
-                float t = (glowIntensity - 0.5f) * 2.0f; // 0 to 1
-                glowColor = juce::Colour(0xffffd700).interpolatedWith(juce::Colours::white, t * layerProgress);
-            }
+            // Very subtle color - stay mostly orange
+            juce::Colour glowColor = juce::Colour(0xffff8c00).interpolatedWith(
+                juce::Colour(0xffffa500), glowIntensity * layerProgress * 0.3f);
             
-            float alpha = pulsedIntensity * (0.3f + layerProgress * 0.4f);
+            float alpha = glowIntensity * (0.08f + layerProgress * 0.12f);
             g.setColour(glowColor.withAlpha(alpha));
-            float r = knobRadius - 5 + i * 1.5f;
+            float r = knobRadius - 5 + i * 1.0f;
             g.fillEllipse(centerX - r, centerY - r, r * 2, r * 2);
         }
     }
@@ -208,14 +196,22 @@ void APTFilterEditor::paint(juce::Graphics& g)
     g.drawText("APT-FILTER", bounds.getX(), 40, bounds.getWidth(), 80, 
                juce::Justification::centred);
     
-    // Draw circular progress ring around knob
-    drawCircularProgressRing(g, centerX, centerY, 140.0f);
-    
     // Draw filter type indicator (above knob)
     drawFilterTypeIndicator(g, bounds);
     
     // Draw frequency display (below knob)
     drawFrequencyDisplay(g, bounds);
+    
+    // Draw control labels
+    g.setFont(juce::Font("Arial", 16.0f, juce::Font::bold));
+    
+    // Resonance label (above knob, right side)
+    g.setColour(juce::Colour(0xff000000).withAlpha(0.5f));
+    g.drawText("RES", bounds.getWidth() - 139, bounds.getHeight() - 180, 80, 25, 
+               juce::Justification::centred);
+    g.setColour(juce::Colour(0xffd4c5a9));
+    g.drawText("RES", bounds.getWidth() - 140, bounds.getHeight() - 181, 80, 25, 
+               juce::Justification::centred);
     
     // Draw LP and HP labels
     g.setFont(juce::Font("Arial", 36.0f, juce::Font::bold));
@@ -246,21 +242,16 @@ void APTFilterEditor::resized()
     
     filterSlider.setBounds(knobX, knobY, knobSize, knobSize);
     
-    // Resonance knob (smaller, bottom right)
+    // Resonance knob (smaller, bottom right - more space for text)
     int resKnobSize = 80;
-    int resKnobX = bounds.getWidth() - resKnobSize - 40;
-    int resKnobY = bounds.getHeight() - resKnobSize - 120;
+    int resKnobX = bounds.getWidth() - resKnobSize - 60;
+    int resKnobY = bounds.getHeight() - resKnobSize - 140;
     
-    resonanceSlider.setBounds(resKnobX, resKnobY, resKnobSize, resKnobSize + 25);
+    resonanceSlider.setBounds(resKnobX, resKnobY, resKnobSize, resKnobSize + 30);
 }
 
 void APTFilterEditor::timerCallback()
 {
-    // Update pulse phase for glow pulsing (very subtle)
-    pulsePhase += 0.05f;
-    if (pulsePhase > juce::MathConstants<float>::twoPi)
-        pulsePhase -= juce::MathConstants<float>::twoPi;
-    
     // Repaint for smooth glow animation
     repaint();
 }
@@ -416,89 +407,3 @@ void APTFilterEditor::drawFilterTypeIndicator(juce::Graphics& g, juce::Rectangle
                juce::Justification::centred);
 }
 
-void APTFilterEditor::drawCircularProgressRing(juce::Graphics& g, float centerX, float centerY, float radius)
-{
-    float filterValue = static_cast<float>(filterSlider.getValue());
-    
-    // Ring parameters - closer to knob, like in the image
-    float ringRadius = radius - 10.0f; // Inside the knob area
-    float ringThickness = 8.0f; // Thicker for visibility
-    float dotRadius = 7.0f;
-    
-    // Calculate knob position angle (matches the white indicator line on knob)
-    // Map -1.0 to +1.0 → -135° to +135° (270 degree range)
-    float centerAngle = -juce::MathConstants<float>::pi / 2.0f; // Top position (12 o'clock)
-    float knobAngle = centerAngle + (filterValue * juce::MathConstants<float>::pi * 0.75f);
-    
-    // Draw filled arc from center to knob position (like in the image)
-    if (std::abs(filterValue) > 0.01f)
-    {
-        juce::Colour arcColor;
-        float glowIntensity = std::abs(filterValue);
-        
-        if (glowIntensity < 0.5f)
-        {
-            arcColor = juce::Colour(0xffff8c00); // Orange
-        }
-        else
-        {
-            float t = (glowIntensity - 0.5f) * 2.0f;
-            arcColor = juce::Colour(0xffff8c00).interpolatedWith(juce::Colour(0xffffd700), t);
-        }
-        
-        // Draw filled arc - from center position to knob position
-        g.setColour(arcColor.withAlpha(0.8f));
-        juce::Path filledArc;
-        
-        if (filterValue < 0)
-        {
-            // Left side (LP) - counter-clockwise from center
-            filledArc.addCentredArc(centerX, centerY, ringRadius, ringRadius, 
-                                   0.0f, knobAngle, centerAngle, true);
-        }
-        else
-        {
-            // Right side (HP) - clockwise from center
-            filledArc.addCentredArc(centerX, centerY, ringRadius, ringRadius, 
-                                   0.0f, centerAngle, knobAngle, true);
-        }
-        
-        g.strokePath(filledArc, juce::PathStrokeType(ringThickness, 
-                     juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
-    }
-    
-    // Calculate dot position at the end of the arc
-    float dotX = centerX + ringRadius * std::cos(knobAngle);
-    float dotY = centerY + ringRadius * std::sin(knobAngle);
-    
-    // Draw colored dot at knob position (matches the image)
-    if (std::abs(filterValue) > 0.01f)
-    {
-        juce::Colour dotColor;
-        float glowIntensity = std::abs(filterValue);
-        
-        if (glowIntensity < 0.5f)
-        {
-            dotColor = juce::Colour(0xffff8c00); // Orange
-        }
-        else
-        {
-            float t = (glowIntensity - 0.5f) * 2.0f;
-            dotColor = juce::Colour(0xffff8c00).interpolatedWith(juce::Colour(0xffffd700), t);
-        }
-        
-        // Outer glow
-        g.setColour(dotColor.withAlpha(0.4f));
-        g.fillEllipse(dotX - dotRadius * 1.8f, dotY - dotRadius * 1.8f, 
-                     dotRadius * 3.6f, dotRadius * 3.6f);
-        
-        // Main dot
-        g.setColour(dotColor);
-        g.fillEllipse(dotX - dotRadius, dotY - dotRadius, dotRadius * 2.0f, dotRadius * 2.0f);
-        
-        // Bright highlight
-        g.setColour(juce::Colours::white.withAlpha(0.8f));
-        g.fillEllipse(dotX - dotRadius * 0.4f, dotY - dotRadius * 0.6f, 
-                     dotRadius * 0.8f, dotRadius * 0.8f);
-    }
-}
