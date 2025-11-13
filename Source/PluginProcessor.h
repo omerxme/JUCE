@@ -1,6 +1,7 @@
 #pragma once
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_dsp/juce_dsp.h>
+#include "PresetManager.h"
 
 class APTFilterProcessor : public juce::AudioProcessor
 {
@@ -32,6 +33,7 @@ public:
     void setStateInformation(const void* data, int sizeInBytes) override;
 
     juce::AudioProcessorValueTreeState& getAPVTS() { return apvts; }
+    PresetManager& getPresetManager() { return presetManager; }
 
 private:
     juce::AudioProcessorValueTreeState apvts;
@@ -43,6 +45,8 @@ private:
     juce::dsp::ProcessorDuplicator<Filter, FilterCoefs> leftFilter, rightFilter;
     juce::SmoothedValue<float> smoothedFilterValue;
     juce::SmoothedValue<float> smoothedResonance;
+    
+    PresetManager presetManager;
 
     void updateFilter(float filterValue, float resonance, double sampleRate);
 

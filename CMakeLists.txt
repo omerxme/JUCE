@@ -32,6 +32,8 @@ target_sources(APTFilter PRIVATE
     Source/PluginProcessor.cpp
     Source/PluginEditor.cpp
     Source/CustomLookAndFeel.cpp
+    Source/PresetManager.cpp
+    Source/FrequencyResponseGraph.cpp
 )
 
 # Binary resources (logo)

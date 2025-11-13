@@ -3,6 +3,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include "PluginProcessor.h"
 #include "CustomLookAndFeel.h"
+#include "FrequencyResponseGraph.h"
 
 class APTFilterEditor : public juce::AudioProcessorEditor, private juce::Timer
 {
@@ -23,6 +24,9 @@ private:
     
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> filterAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> resonanceAttachment;
+    
+    juce::ComboBox presetSelector;
+    FrequencyResponseGraph frequencyGraph;
     
     juce::Image logoImage;
     

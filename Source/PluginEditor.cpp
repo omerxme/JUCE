@@ -5,7 +5,7 @@
 APTFilterEditor::APTFilterEditor(APTFilterProcessor& p)
     : AudioProcessorEditor(&p), audioProcessor(p)
 {
-    setSize(500, 600);
+    setSize(500, 650); // Increased height for preset selector
 
     // Filter slider setup
     filterSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
@@ -48,6 +48,36 @@ APTFilterEditor::APTFilterEditor(APTFilterProcessor& p)
     
     resonanceAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
         audioProcessor.getAPVTS(), "resonance", resonanceSlider);
+    
+    // Preset selector setup
+    presetSelector.setTextWhenNothingSelected("Select Preset...");
+    presetSelector.setTextWhenNoChoicesAvailable("No Presets");
+    
+    // Style the combo box
+    presetSelector.setColour(juce::ComboBox::backgroundColourId, juce::Colour(0xff2a2a2a));
+    presetSelector.setColour(juce::ComboBox::textColourId, juce::Colour(0xffd4c5a9));
+    presetSelector.setColour(juce::ComboBox::outlineColourId, juce::Colour(0xff555555));
+    presetSelector.setColour(juce::ComboBox::arrowColourId, juce::Colour(0xffd4c5a9));
+    
+    auto& presetManager = audioProcessor.getPresetManager();
+    for (int i = 0; i < presetManager.getNumPresets(); ++i)
+    {
+        presetSelector.addItem(presetManager.getPresetName(i), i + 1);
+    }
+    
+    presetSelector.onChange = [this]()
+    {
+        int selectedId = presetSelector.getSelectedId();
+        if (selectedId > 0)
+        {
+            audioProcessor.getPresetManager().loadPreset(selectedId - 1, audioProcessor.getAPVTS());
+        }
+    };
+    
+    addAndMakeVisible(presetSelector);
+    
+    // Frequency response graph setup
+    addAndMakeVisible(frequencyGraph);
     
     // Load logo from binary data
     int logoDataSize = 0;
@@ -221,13 +251,20 @@ void APTFilterEditor::paint(juce::Graphics& g)
     
     // Shadow
     g.setColour(juce::Colour(0xff000000).withAlpha(0.5f));
-    g.drawText("APT-FILTER", bounds.getX(), 42, bounds.getWidth(), 80, 
+    g.drawText("APT-FILTER", bounds.getX(), 52, bounds.getWidth(), 80, 
                juce::Justification::centred);
     
     // Main text (beige/tan color)
     g.setColour(juce::Colour(0xffd4c5a9));
-    g.drawText("APT-FILTER", bounds.getX(), 40, bounds.getWidth(), 80, 
+    g.drawText("APT-FILTER", bounds.getX(), 50, bounds.getWidth(), 80, 
                juce::Justification::centred);
+    
+    // Draw "PRESETS" label above combo box
+    g.setFont(juce::Font("Arial", 12.0f, juce::Font::bold));
+    g.setColour(juce::Colour(0xff000000).withAlpha(0.5f));
+    g.drawText("PRESETS", bounds.getX() + 21, 3, 80, 20, juce::Justification::centredLeft);
+    g.setColour(juce::Colour(0xffd4c5a9));
+    g.drawText("PRESETS", bounds.getX() + 20, 2, 80, 20, juce::Justification::centredLeft);
     
     // Draw filter type indicator (above knob)
     drawFilterTypeIndicator(g, bounds);
@@ -284,11 +321,21 @@ void APTFilterEditor::resized()
 {
     auto bounds = getLocalBounds();
     
+    // Preset selector at top
+    presetSelector.setBounds(bounds.getX() + 20, bounds.getY() + 15, bounds.getWidth() - 40, 30);
+    
     // Center the main filter knob
     int knobSize = 280;
     int knobX = (bounds.getWidth() - knobSize) / 2;
-    int knobY = (bounds.getHeight() - knobSize) / 2 + 20;
+    int knobY = (bounds.getHeight() - knobSize) / 2 + 30;
     
+    // Frequency response graph INSIDE the knob (smaller, centered)
+    int graphSize = 160; // Smaller to fit inside knob
+    int graphX = (bounds.getWidth() - graphSize) / 2;
+    int graphY = knobY + (knobSize - graphSize) / 2;
+    frequencyGraph.setBounds(graphX, graphY, graphSize, graphSize);
+    
+    // Filter slider AFTER graph so it's on top for mouse events
     filterSlider.setBounds(knobX, knobY, knobSize, knobSize);
     
     // Resonance knob (smaller, bottom right - more space for text)
@@ -301,6 +348,11 @@ void APTFilterEditor::resized()
 
 void APTFilterEditor::timerCallback()
 {
+    // Update frequency graph
+    float filterValue = static_cast<float>(filterSlider.getValue());
+    float resonance = static_cast<float>(resonanceSlider.getValue());
+    frequencyGraph.updateResponse(filterValue, resonance, audioProcessor.getSampleRate());
+    
     // Repaint for smooth glow animation
     repaint();
 }

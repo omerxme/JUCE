@@ -7,22 +7,36 @@
 - **Smooth Transitions:** Crossfade ile volume sıçraması yok
 - **Snap-to-Center:** Orta noktaya otomatik yapışma
 - **True Bypass:** Center'da DSP kapalı, temiz sinyal
+- **Resonance Control:** Q değeri ayarlanabilir (0.5 - 10.0)
 
 ### ✅ Audio Processing
 - **Filter Types:** IIR Low-Pass & High-Pass
 - **Frequency Ranges:** 
   - LPF: 20 kHz → 200 Hz
   - HPF: 20 Hz → 1 kHz
-- **Smoothing:** 50ms parameter ramp
+- **Smoothing:** 100ms filter, 50ms resonance ramp
 - **Crossfade Zone:** ±0.1 bypass etrafında
 - **No Clicks/Pops:** Smooth geçişler
 
 ### ✅ Visual Design
 - **Realistic Glow:** 85-layer light bulb effect
-- **Color Temperature:** Orange → Yellow → White
+- **Color Differentiation:** Blue (LP) / Orange (HP)
 - **Retro Knob:** Brass ring, bakelite body, ribbed texture
 - **Vintage Aesthetic:** Corner screws, dark background
 - **Smooth Animation:** 30 Hz timer-based updates
+- **Frequency Display:** Real-time cutoff frequency
+- **Filter Type Indicator:** LOW PASS / BYPASS / HIGH PASS
+
+### ✅ Workflow Features
+- **Preset System:** 6 factory presets
+  - Warm Low Pass
+  - Bright High Pass
+  - Telephone
+  - Radio
+  - DJ Filter
+  - Bypass
+- **Frequency Response Graph:** Real-time curve display behind knob
+- **Color-coded UI:** Visual feedback for filter type
 
 ### ✅ Build & Distribution
 - **Formats:** VST3, AU, Standalone
